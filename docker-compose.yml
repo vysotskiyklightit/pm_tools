@@ -30,6 +30,8 @@ services:
       - ./backend/media/:/app/media/
 
   db:
+    ports:
+      - 5233:5432
     env_file:
       - .env
     image: postgres:12
