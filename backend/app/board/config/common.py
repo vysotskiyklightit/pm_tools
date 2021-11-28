@@ -11,3 +11,7 @@ class EnumChoicesBase(Enum):
 class BoardPreference(EnumChoicesBase):
     public = 'public'
     private = 'private'
+
+
+class SystemUsers(EnumChoicesBase):
+    managers = 'Managers'

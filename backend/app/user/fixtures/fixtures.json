@@ -10,26 +10,6 @@
     }
   },
   {
-    "model": "auth.Group",
-    "pk": "2",
-    "fields": {
-      "name": "Owners",
-      "permissions": [
-
-      ]
-    }
-  },
-  {
-    "model": "auth.Group",
-    "pk": "3",
-    "fields": {
-      "name": "Executors",
-      "permissions": [
-
-      ]
-    }
-  },
-  {
     "model": "auth.User",
     "pk": "2",
     "fields": {

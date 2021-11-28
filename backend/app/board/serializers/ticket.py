@@ -14,6 +14,12 @@ class TicketRetrieveSerialize(ModelSerializer):
         fields = '__all__'
 
 
+class TicketCreateSerialize(ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = '__all__'
+
+
 class TicketUpdateSerialize(ModelSerializer):
     class Meta:
         model = Ticket
