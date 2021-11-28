@@ -10,9 +10,12 @@ class IsAuthenticatedMixin(object):
         return bool(self.request.user and self.request.user.is_authenticated)
 
 
-class SelectorFieldMixinBase(object):
+class SelectorFieldMixin(object):
     INSTANCE_FIELD_NAME: str = None
-    _related_field_map: Dict[Model, str] = None
+    _related_field_map: Dict[Model, str] = {
+        Ticket: 'column',
+        Column: 'board'
+    }
 
     def _get_instance(self, obj) -> Any:
         instance = self._get_field_from_related(obj)
@@ -23,22 +26,6 @@ class SelectorFieldMixinBase(object):
             if isinstance(obj, instance):
                 obj = getattr(obj, field_name)
         return obj
-
-
-class ContributorBoardSelectorFieldMixin(SelectorFieldMixinBase):
-    _related_field_map: Dict[Model, str] = {
-        Ticket: 'column',
-        Column: 'board'
-    }
-    INSTANCE_FIELD_NAME: str = 'contributors'
-
-
-class OwnerBoardSelectorFieldMixin(SelectorFieldMixinBase):
-    _related_field_map: Dict[Model, str] = {
-        Ticket: 'column',
-        Column: 'board'
-    }
-    INSTANCE_FIELD_NAME: str = 'owner'
 
 
 class SelectorPathPKBase(object):

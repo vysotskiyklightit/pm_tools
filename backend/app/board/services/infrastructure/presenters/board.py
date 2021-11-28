@@ -1,29 +1,27 @@
 from typing import Type
 
-from board.config.utils import IPresenter
-from board.models import Board
-from board.serializers.board import BoardRetrieveUpdateSerializer
+from board.serializers.board import (BoardCreateListSerializer,
+                                     BoardRetrieveUpdateSerializer)
+from board.services.infrastructure.presenters.base import SerializerPresenter
 from rest_framework import status
 from rest_framework.response import Response
 
 
-class BoardPresenter(IPresenter):
+class BoardPresenter(SerializerPresenter):
     serializer_class: Type[
         BoardRetrieveUpdateSerializer] = BoardRetrieveUpdateSerializer
-    created_status = status.HTTP_201_CREATED
 
-    def __init__(self, board: Board):
-        self._board = board
-
-    def present(self):
+    def present(self) -> Response:
+        self._status = status.HTTP_201_CREATED
         serializer = self._get_serializer()
         return self._prepare_response(serializer)
 
-    def _prepare_response(
-            self,
-            serializer: BoardRetrieveUpdateSerializer
-    ) -> Response:
-        return Response(serializer.data, status=self.created_status)
 
-    def _get_serializer(self) -> BoardRetrieveUpdateSerializer:
-        return self.serializer_class(self._board)
+class BoardListPresenter(SerializerPresenter):
+    serializer_class: Type[
+        BoardCreateListSerializer] = BoardCreateListSerializer
+
+    def present(self) -> Response:
+        self._is_list = True
+        serializer = self._get_serializer()
+        return self._prepare_response(serializer)

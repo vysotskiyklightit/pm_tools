@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -35,7 +35,6 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
-
 url_installed_apps = [
     path('api/token/', DecoratedTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
@@ -43,16 +42,14 @@ url_installed_apps = [
          name='token_refresh'),
 ]
 
-
 urlpatterns_DOC = [
-    url(r'^swagger(?P<format>\.json|\.yaml)$',
-        schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
-        name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
-        name='schema-redoc'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$',
+            schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
+            name='schema-swagger-ui'),
+    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
+            name='schema-redoc'),
 ]
-
 
 defaults = [
     path('admin/', admin.site.urls),
@@ -63,11 +60,9 @@ defaults = [
 
 ]
 
-
 api = [
     path('api/', include('user.config.urls')),
     path('api/', include('board.config.urls')),
 ]
-
 
 urlpatterns = url_installed_apps + urlpatterns_DOC + defaults + api

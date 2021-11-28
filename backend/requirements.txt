@@ -5,7 +5,6 @@ django-filter==2.4.0
 pyyaml==5.4.1
 uritemplate==3.0.1
 
-djoser==2.1.0
 djangorestframework-simplejwt==4.8.0
 drf-yasg==1.20.0
 

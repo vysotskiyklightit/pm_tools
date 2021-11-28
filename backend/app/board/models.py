@@ -52,4 +52,12 @@ class TicketComment(models.Model):
         null=True,
         blank=True,
     )
+    head_comment = models.ForeignKey(
+        'board.TicketComment',
+        on_delete=models.SET_NULL,
+        related_name='head_comments',
+        default=None,
+        null=True,
+        blank=True,
+    )
     message = models.TextField(max_length=500)

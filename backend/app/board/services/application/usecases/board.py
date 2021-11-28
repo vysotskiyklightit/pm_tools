@@ -1,23 +1,42 @@
-from board.config.utils import IService
 from board.models import Board
-from board.serializers.board import BoardCreateListSerializer
-from board.services.domain.default_entities import ColumnDefaultEntities
+from board.services.domain.lists import BoardListService
+from board.services.domain.utils import ColumnDefaultEntities
+from board.services.infrastructure.preprocessors.transformation import \
+    BoardDataPreprocessor
+from django.contrib.auth.models import User
+from django.db.models import QuerySet
+
+from .base import BaseCreateCase, BaseListCase
 
 
-class BoardCreateCase(IService):
+class BoardCreateCase(BaseCreateCase):
 
-    def __init__(self, serializer: BoardCreateListSerializer):
-        self._serializer = serializer
+    def create(self) -> Board:
+        self._prepare_request_data()
+        self._serializer = self._preprocess_data()
+        self._create()
 
-    def execute(self) -> Board:
-        self._validate()
-        self._serializer.save()
         board = self._get_board()
         ColumnDefaultEntities(board_id=board.id).execute()
         return board
 
-    def _validate(self):
-        self._serializer.is_valid(raise_exception=True)
+    def _prepare_request_data(self):
+        self._request.data['owner'] = self._request.user.id
 
-    def _get_board(self):
+    def _preprocess_data(self):
+        return BoardDataPreprocessor(self._request).process()
+
+    def _create(self):
+        self._serializer.save()
+
+    def _get_board(self) -> Board:
         return self._serializer.instance
+
+
+class BoardListCase(BaseListCase):
+    queryset: QuerySet = None
+
+    def list(self) -> QuerySet:
+        user: User = self._request.user
+        list_service = BoardListService(user)
+        return list_service.execute()

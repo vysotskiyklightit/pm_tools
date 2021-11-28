@@ -8,7 +8,7 @@ class BaseEntity:
 
 
 ModelType = TypeVar('ModelType', bound=Model)
-EntityType = TypeVar('CreateSchemaType', bound=BaseEntity)
+EntityType = TypeVar('EntityType', bound=BaseEntity)
 
 
 class BaseDAO(Generic[ModelType, EntityType]):

@@ -1,12 +1,11 @@
 from board.config.common import SystemUsers
 from django.contrib.auth.models import Group
-from rest_framework import permissions
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from .helpers import IsAuthenticatedMixin
 
 
-class IsPM(permissions.BasePermission, IsAuthenticatedMixin):
+class IsPM(BasePermission, IsAuthenticatedMixin):
 
     def has_permission(self, request, view):
         self.request = request

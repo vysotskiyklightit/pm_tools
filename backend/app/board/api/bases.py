@@ -6,6 +6,12 @@ from rest_framework.request import Request
 
 
 class PathDependsRelationBaseAPIView(GenericAPIView):
+    """
+    To pull up the entire chain of dependencies in an object.
+    With this method, I can only specify permissions for the
+    head of the dependency chain.
+    """
+
     lookup_relation_fields: List[str] = None
     defaults_path_filters: list = None
 
@@ -18,6 +24,9 @@ class PathDependsRelationBaseAPIView(GenericAPIView):
         return self._add_params_to_request_data(request)
 
     def _add_params_to_request_data(self, request) -> Request:
+        """
+        Select path params and these to request data
+        """
         for field_name in self.lookup_relation_fields:
             if field_name not in self.kwargs:
                 continue
@@ -29,5 +38,5 @@ class PathDependsRelationBaseAPIView(GenericAPIView):
 
 
 class PathDependsRelationBoardAPIView(PathDependsRelationBaseAPIView):
-    lookup_relation_fields: List[str] = ['board']
+    lookup_relation_fields: List[str] = ['board', 'column', 'ticket']
     defaults_path_filters: list = [PathParamsFilter]

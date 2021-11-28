@@ -2,6 +2,10 @@ from rest_framework import filters
 
 
 class PathParamsFilter(filters.BaseFilterBackend):
+    """
+    This filter is designed to automatically filter
+    objects relative to the path.
+    """
 
     def filter_queryset(self, request, queryset, view):
         filters_kwargs = {}
