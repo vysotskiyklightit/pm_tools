@@ -12,8 +12,8 @@ def get_user(django_user_model, test_password, username, **kwargs) -> User:
     if not user_obj.exists():
         kwargs['password'] = test_password
         kwargs['username'] = username
-        user_obj = django_user_model.objects.create_user(**kwargs)
-    return user_obj
+        return django_user_model.objects.create_user(**kwargs)
+    return user_obj.first()
 
 
 @pytest.fixture

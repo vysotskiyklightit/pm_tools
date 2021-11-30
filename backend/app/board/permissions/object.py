@@ -1,15 +1,48 @@
 from typing import Union
 
 from board.models import Board, Column, Ticket
-from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework.permissions import BasePermission
 
-from ..config.common import BoardPreference
 from .group import IsPM
 from .helpers import (IsAuthenticatedMixin, SelectorBoardPath,
                       SelectorFieldMixin)
 
 
-class IsOwnerBoard(BasePermission, IsAuthenticatedMixin, SelectorFieldMixin):
+class IsOwnerBoard(BasePermission,
+                   IsAuthenticatedMixin):
+    def has_permission(self, request, view):
+        self.request = request
+        return self._is_authenticated()
+
+    def has_object_permission(self, request, view, obj: Board):
+        return obj.owner == request.user
+
+
+class IsContributorBoard(IsOwnerBoard):
+
+    def has_object_permission(self, request, view, obj: Board):
+        return request.user in obj.contributors.all()
+
+
+class IsPMBoard(IsPM, IsContributorBoard):
+    pass
+
+
+class IsContributorOrOwnerBoard(BasePermission,
+                                IsAuthenticatedMixin):
+
+    def has_permission(self, request, view):
+        self.request = request
+        return self._is_authenticated()
+
+    def has_object_permission(self, request, view, obj: Board):
+        return bool(obj.owner == request.user
+                    or request.user in obj.contributors.all())
+
+
+class IsOwnerBoardFromPath(BasePermission,
+                           IsAuthenticatedMixin,
+                           SelectorFieldMixin):
     INSTANCE_FIELD_NAME: str = 'owner'
     message = 'You do not have access for this object'
     code = 403
@@ -32,9 +65,9 @@ class IsOwnerBoard(BasePermission, IsAuthenticatedMixin, SelectorFieldMixin):
         return self._get_instance(obj) == request.user
 
 
-class IsContributorBoard(BasePermission,
-                         IsAuthenticatedMixin,
-                         SelectorFieldMixin):
+class IsContributorBoardFromPath(BasePermission,
+                                 IsAuthenticatedMixin,
+                                 SelectorFieldMixin):
     INSTANCE_FIELD_NAME: str = 'contributors'
     message = 'You do not have access for this object'
     code = 403
@@ -57,11 +90,12 @@ class IsContributorBoard(BasePermission,
         return request.user in self._get_instance(obj).all()
 
 
-class IsPMBoard(IsPM, IsContributorBoard):
+class IsPMBoardFromPath(IsPM, IsContributorBoardFromPath):
     pass
 
 
-class IsContributorOrOwnerBoard(IsOwnerBoard, IsContributorBoard):
+class IsContributorOrOwnerBoardFromPath(IsOwnerBoardFromPath,
+                                        IsContributorBoardFromPath):
 
     def has_object_permission(self, request, view, obj: Board):
         is_contributor = self._permission_object_contributor(
@@ -74,16 +108,3 @@ class IsContributorOrOwnerBoard(IsOwnerBoard, IsContributorBoard):
         is_contributor = self._permission_request_contributor(request, view)
         is_owner = self._permission_request_owner(request, view)
         return is_contributor or is_owner
-
-
-class ByPreferenceRule(BasePermission, IsAuthenticatedMixin):
-
-    def has_object_permission(self, request, view, obj: Board):
-        self.request = request
-        is_private_board = obj.preference == BoardPreference.private.value
-        is_owner = self.request.user == obj.owner
-        is_contributor = self.request.user in obj.contributors.all()
-        is_auth = self._is_authenticated()
-        is_safe_method = self.request.method in SAFE_METHODS
-        return bool((not is_private_board and is_auth and is_safe_method)
-                    or (is_owner or is_contributor))

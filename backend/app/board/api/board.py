@@ -1,8 +1,10 @@
 from board.api.bases import PathDependsRelationBoardAPIView
 from board.config.utils import method_permission
 from board.models import Board, Column
-from board.permissions import (IsContributorOrOwnerBoard, IsOwnerBoard, IsPM,
-                               IsPMBoard)
+from board.permissions import (IsContributorOrOwnerBoardFromPath,
+                               IsOwnerBoardFromPath, IsPM, IsPMBoardFromPath)
+from board.permissions.object import (IsContributorOrOwnerBoard, IsOwnerBoard,
+                                      IsPMBoard)
 from board.serializers.board import (BoardCreateListSerializer,
                                      BoardRetrieveUpdateSerializer,
                                      ColumnCreateSerializer,
@@ -82,13 +84,13 @@ class ColumnListCreateView(
     serializer_class = ColumnCreateSerializer
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsContributorOrOwnerBoard])
+    @method_permission([IsContributorOrOwnerBoardFromPath])
     def get(self, request, *args, **kwargs):
         self.serializer_class = ColumnListRetrieveSerializer
         return self.list(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsOwnerBoard, IsPMBoard])
+    @method_permission([IsOwnerBoardFromPath, IsPMBoardFromPath])
     def post(self, request, *args, **kwargs):
         return self.create(self.request)
 
@@ -107,17 +109,17 @@ class ColumnUpdateRetrieveDeleteView(
     lookup_field = 'id'
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsContributorOrOwnerBoard])
+    @method_permission([IsContributorOrOwnerBoardFromPath])
     def get(self, request, *args, **kwargs):
         self.serializer_class = ColumnListRetrieveSerializer
         return self.retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsOwnerBoard, IsPMBoard])
+    @method_permission([IsOwnerBoardFromPath, IsPMBoardFromPath])
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsOwnerBoard])
+    @method_permission([IsOwnerBoardFromPath])
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)

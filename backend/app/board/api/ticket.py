@@ -1,7 +1,7 @@
 from board.api.bases import PathDependsRelationBoardAPIView
 from board.config.utils import method_permission
 from board.models import Ticket, TicketComment
-from board.permissions import IsContributorOrOwnerBoard
+from board.permissions import IsContributorOrOwnerBoardFromPath
 from board.serializers.ticket import (TicketCommentCreateSerialize,
                                       TicketCommentListRetrieveSerialize,
                                       TicketCommentUpdateSerialize,
@@ -25,7 +25,7 @@ class TicketCreateListView(
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketCreateSerialize
-    permission_classes = [IsContributorOrOwnerBoard]
+    permission_classes = [IsContributorOrOwnerBoardFromPath]
 
     @swagger_auto_schema(tags=['ticket'])
     def get(self, request, *args, **kwargs):
@@ -49,7 +49,7 @@ class TicketUpdateRetrieveDeleteView(
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketRetrieveSerialize
-    permission_classes = [IsContributorOrOwnerBoard]
+    permission_classes = [IsContributorOrOwnerBoardFromPath]
     lookup_field = 'id'
 
     @swagger_auto_schema(tags=['ticket'])
@@ -77,7 +77,7 @@ class CommentCreateListView(
     """
     queryset = TicketComment.objects.all()
     serializer_class = TicketCommentListRetrieveSerialize
-    permission_classes = [IsContributorOrOwnerBoard]
+    permission_classes = [IsContributorOrOwnerBoardFromPath]
 
     @swagger_auto_schema(tags=['comment'])
     def get(self, request, *args, **kwargs):
@@ -100,7 +100,7 @@ class CommentUpdateRetrieveDeleteView(
     View for update delete, or present tickets
     """
     queryset = TicketComment.objects.all()
-    permission_classes = [IsContributorOrOwnerBoard]
+    permission_classes = [IsContributorOrOwnerBoardFromPath]
     serializer_class = TicketCommentListRetrieveSerialize
     lookup_field = 'id'
 
@@ -110,12 +110,12 @@ class CommentUpdateRetrieveDeleteView(
         return self.retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['comment'])
-    @method_permission([IsContributorOrOwnerBoard])
+    @method_permission([IsContributorOrOwnerBoardFromPath])
     def put(self, request, *args, **kwargs):
         self.serializer_class = TicketCommentUpdateSerialize
         return self.update(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['comment'])
-    @method_permission([IsContributorOrOwnerBoard])
+    @method_permission([IsContributorOrOwnerBoardFromPath])
     def delete(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)

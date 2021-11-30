@@ -1,3 +1,4 @@
 from .group import IsPM
-from .object import (ByPreferenceRule, IsContributorBoard,
-                     IsContributorOrOwnerBoard, IsOwnerBoard, IsPMBoard)
+from .object import (IsContributorBoardFromPath,
+                     IsContributorOrOwnerBoardFromPath, IsOwnerBoardFromPath,
+                     IsPMBoardFromPath)
