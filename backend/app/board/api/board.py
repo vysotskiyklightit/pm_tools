@@ -4,7 +4,8 @@ from board.models import Board, Column
 from board.permissions import (IsContributorOrOwnerBoardFromPath,
                                IsOwnerBoardFromPath, IsPM, IsPMBoardFromPath)
 from board.permissions.object import (IsContributorOrOwnerBoard, IsOwnerBoard,
-                                      IsPMBoard)
+                                      IsOwnerOrPMBoard,
+                                      IsOwnerOrPMBoardFromPath, IsPMBoard)
 from board.serializers.board import (BoardCreateListSerializer,
                                      BoardRetrieveUpdateSerializer,
                                      ColumnCreateSerializer,
@@ -63,11 +64,11 @@ class BoardUpdateRetrieveView(
     def get(self, request: Request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-    @method_permission([IsOwnerBoard, IsPMBoard])
+    @method_permission([IsOwnerOrPMBoard])
     def put(self, request: Request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-    @method_permission([IsOwnerBoard, IsPMBoard])
+    @method_permission([IsOwnerOrPMBoard])
     def delete(self, request: Request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
@@ -90,7 +91,7 @@ class ColumnListCreateView(
         return self.list(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsOwnerBoardFromPath, IsPMBoardFromPath])
+    @method_permission([IsOwnerOrPMBoardFromPath])
     def post(self, request, *args, **kwargs):
         return self.create(self.request)
 
@@ -115,7 +116,7 @@ class ColumnUpdateRetrieveDeleteView(
         return self.retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['column'])
-    @method_permission([IsOwnerBoardFromPath, IsPMBoardFromPath])
+    @method_permission([IsOwnerOrPMBoardFromPath])
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 

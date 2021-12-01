@@ -31,6 +31,7 @@ def create_pm_group(pm_group):
     group = Group.objects.filter(name=pm_group)
     if not group.exists():
         group = Group(name=pm_group)
+        group.save()
     return group
 
 
@@ -45,8 +46,9 @@ def user(db, django_user_model, test_password, username, **kwargs) -> User:
 def create_pm(django_user_model, pm_username, test_password,
               create_pm_group: Group, **kwargs):
     user = get_user(django_user_model, test_password, pm_username, **kwargs)
-    user.groups.add(create_pm_group.pk)
-    user.save()
+    if create_pm_group not in user.groups.all():
+        user.groups.add(create_pm_group.pk)
+        user.save()
     return user
 
 

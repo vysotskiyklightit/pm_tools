@@ -28,6 +28,17 @@ class IsPMBoard(IsPM, IsContributorBoard):
     pass
 
 
+class IsOwnerOrPMBoard(BasePermission):
+    def has_permission(self, request, view):
+        return bool(IsPMBoard().has_permission(request, view)
+                    or IsOwnerBoard().has_permission(request, view))
+
+    def has_object_permission(self, request, view, obj: Board):
+        return bool(IsPMBoard().has_object_permission(request, view, obj)
+                    or IsOwnerBoard().has_object_permission(request, view, obj)
+                    )
+
+
 class IsContributorOrOwnerBoard(BasePermission,
                                 IsAuthenticatedMixin):
 
@@ -108,3 +119,16 @@ class IsContributorOrOwnerBoardFromPath(IsOwnerBoardFromPath,
         is_contributor = self._permission_request_contributor(request, view)
         is_owner = self._permission_request_owner(request, view)
         return is_contributor or is_owner
+
+
+class IsOwnerOrPMBoardFromPath(BasePermission):
+
+    def has_permission(self, request, view):
+        return bool(IsPMBoardFromPath().has_permission(request, view)
+                    or IsOwnerBoardFromPath().has_permission(request, view))
+
+    def has_object_permission(self, request, view, obj: Board):
+        return bool(
+            IsPMBoardFromPath().has_object_permission(request, view, obj)
+            or IsOwnerBoardFromPath().has_object_permission(request, view, obj)
+        )

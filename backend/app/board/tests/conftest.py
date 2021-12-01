@@ -25,12 +25,12 @@ def auth_header(api_client, auth_username, test_password):
 
 
 def pytest_generate_tests(metafunc):
-    idlist = []
-    argvalues = []
-    if hasattr(metafunc.cls, 'scenarios'):
-        for scenario in metafunc.cls.scenarios:
-            idlist.append(scenario[0])
-            items = scenario[1].items()
-            argnames = [x[0] for x in items]
-            argvalues.append([x[1] for x in items])
-        metafunc.parametrize(argnames, argvalues, ids=idlist, scope='class')
+    if not hasattr(metafunc.cls, 'scenarios'):
+        return
+    if metafunc.function.__name__ not in metafunc.cls.scenarios:
+        return
+    funcarglist = metafunc.cls.scenarios[metafunc.function.__name__]
+    argnames = sorted(funcarglist[0])
+    argvalues = [[funcargs[name] for name in argnames]
+                 for funcargs in funcarglist]
+    metafunc.parametrize(argnames, argvalues)

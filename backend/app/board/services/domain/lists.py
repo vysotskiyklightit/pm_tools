@@ -11,14 +11,11 @@ class BoardListService(IService):
 
     def execute(self) -> QuerySet:
         self._boards = board_dao.fetch()
-        preference_board = self._filter_by_preference()
-        return preference_board
+        return self._filter_by_preference()
 
     def _filter_by_preference(self) -> QuerySet:
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!!
         public_boards = self._boards.filter(
             preference=BoardPreference.public.value)
         private_users_boards = self._boards.filter(
             Q(owner__pk=self._user.id) | Q(contributors__pk=self._user.id))
-        print(private_users_boards, self._user.id)
         return public_boards.union(private_users_boards)
