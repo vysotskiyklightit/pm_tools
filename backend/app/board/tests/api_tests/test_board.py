@@ -166,6 +166,28 @@ class TestBoardPermissionsApi(object):
     }
 
     @pytest.mark.django_db(transaction=True)
+    def test_post(
+            self,
+            api_client,
+            user,
+            create_pm,
+            create_contribs,
+            auth_header,
+            board_preference,
+            status_code,
+    ):
+        data = {
+            'preference': board_preference,
+            'name': 'new board',
+            'contributors': [c.id for c in create_contribs],
+        }
+        create_pm.save()
+        print(create_pm.groups.all(), create_pm.id)
+        api_client.credentials(**auth_header)
+        r = api_client.post('/api/board/', data=data)
+        assert r.status_code == status_code
+
+    @pytest.mark.django_db(transaction=True)
     def test_get_list(
             self,
             api_client,
@@ -249,26 +271,6 @@ class TestBoardPermissionsApi(object):
         if status_code == 200:
             board_name = r.json()['name']
             assert board_name != board.name
-
-    @pytest.mark.django_db(transaction=True)
-    def test_post(
-            self,
-            api_client,
-            user,
-            create_pm,
-            create_contribs,
-            auth_header,
-            board_preference,
-            status_code,
-    ):
-        data = {
-            'preference': board_preference,
-            'name': 'new board',
-            'contributors': [c.id for c in create_contribs],
-        }
-        api_client.credentials(**auth_header)
-        r = api_client.post('/api/board/', data=data)
-        assert r.status_code == status_code
 
     def create_board(
             self, *, owner: User,

@@ -43,12 +43,14 @@ def user(db, django_user_model, test_password, username, **kwargs) -> User:
 
 @pytest.fixture
 @pytest.mark.django_db(transaction=True)
-def create_pm(django_user_model, pm_username, test_password,
+def create_pm(db, django_user_model, pm_username, test_password,
               create_pm_group: Group, **kwargs):
     user = get_user(django_user_model, test_password, pm_username, **kwargs)
     if create_pm_group not in user.groups.all():
         user.groups.add(create_pm_group.pk)
-        user.save()
+    user.save()
+    user = get_user(django_user_model, test_password, pm_username, **kwargs)
+    assert create_pm_group in user.groups.all()
     return user
 
 

@@ -29,11 +29,13 @@ class ColumnCreateSerializer(ModelSerializer):
 
     class Meta:
         model = Column
-        fields = ['name', 'board']
+        fields = ['id', 'name', 'board']
+        read_only_fields = ['id']
 
 
 class ColumnUpdateSerializer(ModelSerializer):
 
     class Meta:
         model = Column
-        fields = ['name', 'board']
+        fields = ['id', 'name', 'board']
+        read_only_fields = ['id']

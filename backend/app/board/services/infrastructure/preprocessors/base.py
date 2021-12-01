@@ -14,9 +14,6 @@ class SerializerDataPreprocessorBase(IPreprocessors):
         self._request: Request = request
 
     def process(self) -> SerializerType:
-        serializer = self.serializer_class()
+        serializer = self.serializer_class(data=self._request.data)
         serializer.is_valid(raise_exception=True)
         return serializer
-
-    def _get_serializer(self) -> SerializerType:
-        return self.serializer_class(data=self._request.data)

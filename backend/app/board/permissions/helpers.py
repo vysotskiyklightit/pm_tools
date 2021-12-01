@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from board.models import Board, Column, Ticket
+from board.models import Board, Column, Ticket, TicketComment
 from django.db.models import Model
 
 
@@ -13,6 +13,7 @@ class IsAuthenticatedMixin(object):
 class SelectorFieldMixin(object):
     INSTANCE_FIELD_NAME: str = None
     _related_field_map: Dict[Model, str] = {
+        TicketComment: 'ticket',
         Ticket: 'column',
         Column: 'board'
     }

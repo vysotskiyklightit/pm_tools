@@ -76,7 +76,7 @@ class CommentCreateListView(
     View for create or present list of tickets
     """
     queryset = TicketComment.objects.all()
-    serializer_class = TicketCommentListRetrieveSerialize
+    serializer_class = TicketCommentCreateSerialize
     permission_classes = [IsContributorOrOwnerBoardFromPath]
 
     @swagger_auto_schema(tags=['comment'])

@@ -6,4 +6,6 @@ from .base import SerializerDataPreprocessorBase
 
 
 class BoardDataPreprocessor(SerializerDataPreprocessorBase):
-    serializer_class: Type[BoardCreateListSerializer]
+    serializer_class: Type[
+        BoardCreateListSerializer
+    ] = BoardCreateListSerializer

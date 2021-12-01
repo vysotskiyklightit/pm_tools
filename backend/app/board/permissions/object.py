@@ -67,19 +67,20 @@ class IsOwnerBoardFromPath(BasePermission,
 
     def _permission_request_owner(self, request, view):
         self.request = request
+        self.INSTANCE_FIELD_NAME: str = 'owner'
         obj = SelectorBoardPath().get_model_object(view.kwargs)
         return bool(obj and self._is_authenticated
                     and self._get_instance(obj) == request.user)
 
     def _permission_object_owner(self, request, view,
                                  obj: Union[Board, Column, Ticket]):
+        self.INSTANCE_FIELD_NAME: str = 'owner'
         return self._get_instance(obj) == request.user
 
 
 class IsContributorBoardFromPath(BasePermission,
                                  IsAuthenticatedMixin,
                                  SelectorFieldMixin):
-    INSTANCE_FIELD_NAME: str = 'contributors'
     message = 'You do not have access for this object'
     code = 403
 
@@ -91,6 +92,7 @@ class IsContributorBoardFromPath(BasePermission,
         return self._permission_object_contributor(request, view, obj)
 
     def _permission_request_contributor(self, request, view):
+        self.INSTANCE_FIELD_NAME: str = 'contributors'
         self.request = request
         obj = SelectorBoardPath().get_model_object(view.kwargs)
         return bool(obj and self._is_authenticated
@@ -98,6 +100,7 @@ class IsContributorBoardFromPath(BasePermission,
 
     def _permission_object_contributor(self, request, view,
                                        obj: Union[Board, Column, Ticket]):
+        self.INSTANCE_FIELD_NAME: str = 'contributors'
         return request.user in self._get_instance(obj).all()
 
 
@@ -113,11 +116,13 @@ class IsContributorOrOwnerBoardFromPath(IsOwnerBoardFromPath,
             request, view, obj)
         is_owner = self._permission_object_owner(
             request, view, obj)
+
         return is_contributor or is_owner
 
     def has_permission(self, request, view):
         is_contributor = self._permission_request_contributor(request, view)
         is_owner = self._permission_request_owner(request, view)
+
         return is_contributor or is_owner
 
 

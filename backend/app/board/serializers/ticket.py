@@ -1,5 +1,8 @@
 from board.models import Ticket, TicketComment
-from rest_framework.fields import CharField, IntegerField
+from board.serializers.utils import TokenUserDefault
+from django.contrib.auth.models import User
+from rest_framework.fields import (CharField, CurrentUserDefault, HiddenField,
+                                   IntegerField)
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField, Serializer)
 from user.serializers.user import UserCommentSerializer
@@ -37,12 +40,15 @@ class TicketCommentListRetrieveSerialize(Serializer):
 
 
 class TicketCommentCreateSerialize(ModelSerializer):
+    owner = HiddenField(default=TokenUserDefault())
+
     class Meta:
         model = TicketComment
-        fields = '__all__'
+        fields = ['id', 'ticket', 'owner', 'head_comment', 'message']
+        read_only_fields = ['id']
 
 
 class TicketCommentUpdateSerialize(ModelSerializer):
     class Meta:
         model = TicketComment
-        fields = ['message']
+        fields = '__all__'
