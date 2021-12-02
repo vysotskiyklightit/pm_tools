@@ -1,6 +1,6 @@
 from typing import Type
 
-from board.serializers.board import (BoardCreateListSerializer,
+from board.serializers.board import (BoardListSerializer,
                                      BoardRetrieveUpdateSerializer)
 from board.services.infrastructure.presenters.base import SerializerPresenter
 from rest_framework import status
@@ -19,7 +19,7 @@ class BoardPresenter(SerializerPresenter):
 
 class BoardListPresenter(SerializerPresenter):
     serializer_class: Type[
-        BoardCreateListSerializer] = BoardCreateListSerializer
+        BoardListSerializer] = BoardListSerializer
 
     def present(self) -> Response:
         self._is_list = True

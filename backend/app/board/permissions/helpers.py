@@ -45,3 +45,40 @@ class SelectorPathPKBase(object):
 class SelectorBoardPath(SelectorPathPKBase):
     lookup_field: str = 'board'
     model: Model = Board
+
+
+class ObjectPathPermission(object):
+    INSTANCE_FIELD_NAME: str = None
+
+    def __init__(self, request, view):
+        self._request = request
+        self._view = view
+
+    def permission_object(self, obj):
+        raise NotImplementedError
+
+    def permission_request(self):
+        raise NotImplementedError
+
+
+class OwnerBoardPermission(ObjectPathPermission, SelectorFieldMixin):
+    INSTANCE_FIELD_NAME: str = 'owner'
+
+    def permission_object(self, obj):
+        return self._get_instance(obj) == self._request.user
+
+    def permission_request(self):
+        obj = SelectorBoardPath().get_model_object(self._view.kwargs)
+        return bool(obj and self._get_instance(obj) == self._request.user)
+
+
+class ContributorBoardPermission(ObjectPathPermission, SelectorFieldMixin):
+    INSTANCE_FIELD_NAME: str = 'contributors'
+
+    def permission_object(self, obj):
+        return self._request.user in self._get_instance(obj).all()
+
+    def permission_request(self):
+        obj = SelectorBoardPath().get_model_object(self._view.kwargs)
+        return bool(
+            obj and self._request.user in self._get_instance(obj).all())

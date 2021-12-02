@@ -1,17 +1,50 @@
 import pytest
 from board.config.common import BoardPreference
-from board.models import Board
+from board.models import Board, Column, Ticket
 from board.tests.api_tests import scenarios
 from django.contrib.auth.models import User
 
+list_owner_public = {
+    'username': 'test_user',
+    'pm_username': 'pm_board',
+    'contrib_usernames': ['pm_board', 'some_person'],
+    'auth_username': 'pm_board',
+    'board_preference': BoardPreference.public.value,
+    'len_response': 4
+}
+list_owner_private = {
+    'username': 'test_user',
+    'pm_username': 'pm_board',
+    'contrib_usernames': ['pm_board', 'some_person'],
+    'auth_username': 'pm_board',
+    'board_preference': BoardPreference.private.value,
+    'len_response': 4
+}
+list_contrib_private = {
+    'username': 'test_user',
+    'pm_username': 'pm_board',
+    'contrib_usernames': ['pm_board', 'some_person'],
+    'auth_username': 'some_person',
+    'board_preference': BoardPreference.private.value,
+    'len_response': 4
+}
+list_user_private = {
+    'username': 'test_user',
+    'pm_username': 'pm_board',
+    'contrib_usernames': ['pm_board', 'some_person'],
+    'auth_username': 'test_user',
+    'board_preference': BoardPreference.private.value,
+    'len_response': 1
+}
 
-class TestBoardPermissionsApi(object):
+
+class TestTicketPermissionsApi(object):
     scenarios = {
         'test_get_list': (
-            scenarios.list_owner_public,
-            scenarios.list_owner_private,
-            scenarios.list_contrib_private,
-            scenarios.list_user_private
+            list_owner_public,
+            list_owner_private,
+            list_contrib_private,
+            list_user_private
         ),
         'test_get': (
             scenarios.get_owner_public,
@@ -37,28 +70,6 @@ class TestBoardPermissionsApi(object):
     }
 
     @pytest.mark.django_db(transaction=True)
-    def test_post(
-            self,
-            api_client,
-            user,
-            create_pm,
-            create_contribs,
-            auth_header,
-            board_preference,
-            status_code,
-    ):
-        data = {
-            'preference': board_preference,
-            'name': 'new board',
-            'contributors': [c.id for c in create_contribs],
-        }
-        create_pm.save()
-        print(create_pm.groups.all(), create_pm.id)
-        api_client.credentials(**auth_header)
-        r = api_client.post('/api/board/', data=data)
-        assert r.status_code == status_code
-
-    @pytest.mark.django_db(transaction=True)
     def test_get_list(
             self,
             api_client,
@@ -69,11 +80,13 @@ class TestBoardPermissionsApi(object):
             board_preference,
             len_response,
     ):
-        self.create_board(owner=create_pm,
-                          contributors=create_contribs,
-                          preference=board_preference)
+        board = self.create_board(owner=create_pm,
+                                  contributors=create_contribs,
+                                  preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        self.create_ticket(column_id=column.id)
         api_client.credentials(**auth_header)
-        r = api_client.get('/api/board/')
+        r = api_client.get(f'/api/board/{board.id}/column/{column.id}/ticket/')
         assert len(r.json()) == len_response
 
     @pytest.mark.django_db(transaction=True)
@@ -90,8 +103,11 @@ class TestBoardPermissionsApi(object):
         board = self.create_board(owner=create_pm,
                                   contributors=create_contribs,
                                   preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
         api_client.credentials(**auth_header)
-        r = api_client.get(f'/api/board/{board.id}/')
+        r = api_client.get(
+            f'/api/board/{board.id}/column/{column.id}/ticket/{ticket.id}/')
         assert r.status_code == status_code
 
     @pytest.mark.django_db(transaction=True)
@@ -108,19 +124,19 @@ class TestBoardPermissionsApi(object):
         board = self.create_board(owner=create_pm,
                                   contributors=create_contribs,
                                   preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
         api_client.credentials(**auth_header)
         data = {
-            'owner': board.owner.pk,
-            'contributors': [contrib.id for contrib in
-                             board.contributors.all()],
-            'name': 'new name',
-            'preference': board_preference
+            'name': 'new name'
         }
-        r = api_client.put(f'/api/board/{board.id}/', data=data)
+        r = api_client.put(
+            f'/api/board/{board.id}/column/{column.id}/ticket/{ticket.id}/',
+            data=data)
         assert r.status_code == status_code
         if status_code == 200:
-            board_name = r.json()['name']
-            assert board_name != board.name
+            ticket_name = r.json()['name']
+            assert ticket_name != ticket.name
 
     @pytest.mark.django_db(transaction=True)
     def test_delete(
@@ -136,12 +152,40 @@ class TestBoardPermissionsApi(object):
         board = self.create_board(owner=create_pm,
                                   contributors=create_contribs,
                                   preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
         api_client.credentials(**auth_header)
-        r = api_client.delete(f'/api/board/{board.id}/')
+        r = api_client.delete(
+            f'/api/board/{board.id}/column/{column.id}/ticket/{ticket.id}/')
         assert r.status_code == status_code
         if status_code == 200:
             board_name = r.json()['name']
             assert board_name != board.name
+
+    @pytest.mark.django_db(transaction=True)
+    def test_post(
+            self,
+            api_client,
+            user,
+            create_pm,
+            create_contribs,
+            auth_header,
+            board_preference,
+            status_code,
+    ):
+        board = self.create_board(owner=create_pm,
+                                  contributors=create_contribs,
+                                  preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        data = {
+            'name': 'new column',
+            'description': 'new descript',
+        }
+        api_client.credentials(**auth_header)
+        r = api_client.post(
+            f'/api/board/{board.id}/column/{column.id}/ticket/', data=data
+        )
+        assert r.status_code == status_code
 
     def create_board(
             self, *, owner: User,
@@ -159,3 +203,16 @@ class TestBoardPermissionsApi(object):
             board.contributors.set(contributors)
         board.save()
         return board
+
+    def create_column(self, board_id):
+        column = Column(name='Test column', board_id=board_id)
+        column.save()
+        return column
+
+    def create_ticket(self, column_id):
+        ticket = Ticket(column_id=column_id,
+                        name='Test column',
+                        description='Test description',
+                        )
+        ticket.save()
+        return ticket

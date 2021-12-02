@@ -2,11 +2,12 @@ from board.api.bases import PathDependsRelationBoardAPIView
 from board.config.utils import method_permission
 from board.models import Board, Column
 from board.permissions import (IsContributorOrOwnerBoardFromPath,
-                               IsOwnerBoardFromPath, IsPM, IsPMBoardFromPath)
-from board.permissions.object import (IsContributorOrOwnerBoard, IsOwnerBoard,
+                               IsOwnerBoardFromPath, IsPM)
+from board.permissions.object import (IsContributorOrOwnerBoard,
                                       IsOwnerOrPMBoard,
-                                      IsOwnerOrPMBoardFromPath, IsPMBoard)
-from board.serializers.board import (BoardCreateListSerializer,
+                                      IsOwnerOrPMBoardFromPath)
+from board.serializers.board import (BoardCreateSerializer,
+                                     BoardListSerializer,
                                      BoardRetrieveUpdateSerializer,
                                      ColumnCreateSerializer,
                                      ColumnListRetrieveSerializer,
@@ -32,14 +33,14 @@ class BoardCreateListView(APIView):
     """
 
     @swagger_auto_schema(
-        responses={status.HTTP_200_OK: BoardCreateListSerializer()})
+        responses={status.HTTP_200_OK: BoardListSerializer()})
     @method_permission([IsAuthenticated])
     def get(self, request: Request, *args, **kwargs):
         boards = BoardListCase(request).list()
         return BoardListPresenter(boards).present()
 
     @swagger_auto_schema(
-        request_body=BoardCreateListSerializer(),
+        request_body=BoardCreateSerializer(),
         responses={status.HTTP_200_OK: BoardRetrieveUpdateSerializer()})
     @method_permission([IsPM])
     def post(self, request: Request, *args, **kwargs):

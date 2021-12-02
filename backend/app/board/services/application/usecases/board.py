@@ -12,16 +12,12 @@ from .base import BaseCreateCase, BaseListCase
 class BoardCreateCase(BaseCreateCase):
 
     def create(self) -> Board:
-        self._prepare_request_data()
         self._serializer = self._preprocess_data()
         self._create()
 
         board = self._get_board()
         ColumnDefaultEntities(board_id=board.id).execute()
         return board
-
-    def _prepare_request_data(self):
-        self._request.data['owner'] = self._request.user.id
 
     def _preprocess_data(self):
         return BoardDataPreprocessor(self._request).process()

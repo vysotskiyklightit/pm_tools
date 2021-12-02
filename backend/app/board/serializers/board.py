@@ -1,15 +1,22 @@
 from board.models import Board, Column
+from board.serializers.fields import BoardPathParamsDefault, TokenUserDefault
 from board.serializers.ticket import TicketListSerialize
-from rest_framework.fields import IntegerField
+from rest_framework.fields import HiddenField, IntegerField
 from rest_framework.serializers import CharField, ModelSerializer, Serializer
 
 
-class BoardCreateListSerializer(ModelSerializer):
+class BoardCreateSerializer(ModelSerializer):
+    owner = HiddenField(default=TokenUserDefault())
+
     class Meta:
         model = Board
-        fields = ['id', 'name', 'preference', 'owner']
-        read_only_fields = ['id']
-        extra_kwargs = {'owner': {'write_only': True}}
+        fields = ['name', 'preference', 'owner']
+
+
+class BoardListSerializer(Serializer):
+    id = IntegerField()
+    name = CharField()
+    preference = CharField()
 
 
 class BoardRetrieveUpdateSerializer(ModelSerializer):
@@ -26,16 +33,17 @@ class ColumnListRetrieveSerializer(Serializer):
 
 
 class ColumnCreateSerializer(ModelSerializer):
+    board_id = HiddenField(default=BoardPathParamsDefault())
 
     class Meta:
         model = Column
-        fields = ['id', 'name', 'board']
+        fields = ['id', 'name', 'board_id']
         read_only_fields = ['id']
 
 
-class ColumnUpdateSerializer(ModelSerializer):
+class ColumnUpdateSerializer(ColumnCreateSerializer):
 
     class Meta:
         model = Column
-        fields = ['id', 'name', 'board']
+        fields = ['id', 'name']
         read_only_fields = ['id']

@@ -4,8 +4,8 @@ from board.models import Board, Column, Ticket
 from rest_framework.permissions import BasePermission
 
 from .group import IsPM
-from .helpers import (IsAuthenticatedMixin, SelectorBoardPath,
-                      SelectorFieldMixin)
+from .helpers import (ContributorBoardPermission, IsAuthenticatedMixin,
+                      OwnerBoardPermission)
 
 
 class IsOwnerBoard(BasePermission,
@@ -34,9 +34,9 @@ class IsOwnerOrPMBoard(BasePermission):
                     or IsOwnerBoard().has_permission(request, view))
 
     def has_object_permission(self, request, view, obj: Board):
-        return bool(IsPMBoard().has_object_permission(request, view, obj)
-                    or IsOwnerBoard().has_object_permission(request, view, obj)
-                    )
+        return bool(
+            IsPMBoard().has_object_permission(request, view, obj)
+            or IsOwnerBoard().has_object_permission(request, view, obj))
 
 
 class IsContributorOrOwnerBoard(BasePermission,
@@ -52,76 +52,59 @@ class IsContributorOrOwnerBoard(BasePermission,
 
 
 class IsOwnerBoardFromPath(BasePermission,
-                           IsAuthenticatedMixin,
-                           SelectorFieldMixin):
-    INSTANCE_FIELD_NAME: str = 'owner'
+                           IsAuthenticatedMixin):
     message = 'You do not have access for this object'
     code = 403
 
     def has_permission(self, request, view):
-        return self._permission_request_owner(request, view)
+        self.request = request
+        object_permission = OwnerBoardPermission(request, view)
+        return bool(object_permission.permission_request()
+                    and self._is_authenticated)
 
     def has_object_permission(self, request, view,
                               obj: Union[Board, Column, Ticket]):
-        return self._permission_object_owner(request, view, obj)
-
-    def _permission_request_owner(self, request, view):
-        self.request = request
-        self.INSTANCE_FIELD_NAME: str = 'owner'
-        obj = SelectorBoardPath().get_model_object(view.kwargs)
-        return bool(obj and self._is_authenticated
-                    and self._get_instance(obj) == request.user)
-
-    def _permission_object_owner(self, request, view,
-                                 obj: Union[Board, Column, Ticket]):
-        self.INSTANCE_FIELD_NAME: str = 'owner'
-        return self._get_instance(obj) == request.user
+        object_permission = OwnerBoardPermission(request, view)
+        return object_permission.permission_object(obj)
 
 
 class IsContributorBoardFromPath(BasePermission,
-                                 IsAuthenticatedMixin,
-                                 SelectorFieldMixin):
+                                 IsAuthenticatedMixin):
     message = 'You do not have access for this object'
     code = 403
 
     def has_permission(self, request, view):
-        return self._permission_request_contributor(request, view)
+        self.request = request
+        object_permission = ContributorBoardPermission(request, view)
+        return bool(self._is_authenticated
+                    and object_permission.permission_request())
 
     def has_object_permission(self, request, view,
                               obj: Union[Board, Column, Ticket]):
-        return self._permission_object_contributor(request, view, obj)
-
-    def _permission_request_contributor(self, request, view):
-        self.INSTANCE_FIELD_NAME: str = 'contributors'
-        self.request = request
-        obj = SelectorBoardPath().get_model_object(view.kwargs)
-        return bool(obj and self._is_authenticated
-                    and request.user in self._get_instance(obj).all())
-
-    def _permission_object_contributor(self, request, view,
-                                       obj: Union[Board, Column, Ticket]):
-        self.INSTANCE_FIELD_NAME: str = 'contributors'
-        return request.user in self._get_instance(obj).all()
+        object_permission = ContributorBoardPermission(request, view)
+        return object_permission.permission_object(obj)
 
 
 class IsPMBoardFromPath(IsPM, IsContributorBoardFromPath):
     pass
 
 
-class IsContributorOrOwnerBoardFromPath(IsOwnerBoardFromPath,
-                                        IsContributorBoardFromPath):
-
-    def has_object_permission(self, request, view, obj: Board):
-        is_contributor = self._permission_object_contributor(
-            request, view, obj)
-        is_owner = self._permission_object_owner(
-            request, view, obj)
-
-        return is_contributor or is_owner
+class IsContributorOrOwnerBoardFromPath(BasePermission,
+                                        IsAuthenticatedMixin):
 
     def has_permission(self, request, view):
-        is_contributor = self._permission_request_contributor(request, view)
-        is_owner = self._permission_request_owner(request, view)
+        self.request = request
+
+        is_contributor = ContributorBoardPermission(
+            request, view).permission_request()
+        is_owner = OwnerBoardPermission(request, view).permission_request()
+
+        return (is_contributor or is_owner) and self._is_authenticated()
+
+    def has_object_permission(self, request, view, obj: Board):
+        is_contributor = ContributorBoardPermission(
+            request, view).permission_object(obj)
+        is_owner = OwnerBoardPermission(request, view).permission_object(obj)
 
         return is_contributor or is_owner
 

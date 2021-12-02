@@ -64,7 +64,7 @@ class TicketUpdateRetrieveDeleteView(
 
     @swagger_auto_schema(tags=['ticket'])
     def delete(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)
 
 
 class CommentCreateListView(
@@ -118,4 +118,4 @@ class CommentUpdateRetrieveDeleteView(
     @swagger_auto_schema(tags=['comment'])
     @method_permission([IsContributorOrOwnerBoardFromPath])
     def delete(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)

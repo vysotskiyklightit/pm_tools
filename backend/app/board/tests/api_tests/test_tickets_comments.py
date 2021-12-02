@@ -1,6 +1,6 @@
 import pytest
 from board.config.common import BoardPreference
-from board.models import Board, Column
+from board.models import Board, Column, Ticket, TicketComment
 from board.tests.api_tests import scenarios
 from django.contrib.auth.models import User
 
@@ -38,7 +38,7 @@ list_user_private = {
 }
 
 
-class TestColumnPermissionsApi(object):
+class TestTicketCommentsPermissionsApi(object):
     scenarios = {
         'test_get_list': (
             list_owner_public,
@@ -83,9 +83,16 @@ class TestColumnPermissionsApi(object):
         board = self.create_board(owner=create_pm,
                                   contributors=create_contribs,
                                   preference=board_preference)
-        self.create_column(board_id=board.id)
+        column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
+        self.create_ticket_comment(
+            ticket.id,
+            owner_id=create_contribs[0].id)
         api_client.credentials(**auth_header)
-        r = api_client.get(f'/api/board/{board.id}/column/')
+        r = api_client.get(
+            f'/api/board/{board.id}/column/{column.id}/'
+            f'ticket/{ticket.id}/comment/'
+        )
         assert len(r.json()) == len_response
 
     @pytest.mark.django_db(transaction=True)
@@ -103,8 +110,15 @@ class TestColumnPermissionsApi(object):
                                   contributors=create_contribs,
                                   preference=board_preference)
         column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
+        ticket_comment = self.create_ticket_comment(
+            ticket.id,
+            owner_id=create_contribs[0].id)
         api_client.credentials(**auth_header)
-        r = api_client.get(f'/api/board/{board.id}/column/{column.id}/')
+        r = api_client.get(
+            f'/api/board/{board.id}/column/{column.id}/'
+            f'ticket/{ticket.id}/comment/{ticket_comment.id}/'
+        )
         assert r.status_code == status_code
 
     @pytest.mark.django_db(transaction=True)
@@ -122,16 +136,22 @@ class TestColumnPermissionsApi(object):
                                   contributors=create_contribs,
                                   preference=board_preference)
         column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
+        ticket_comment = self.create_ticket_comment(
+            ticket.id,
+            owner_id=create_contribs[0].id)
         api_client.credentials(**auth_header)
         data = {
-            'name': 'new name'
+            'message': 'my message'
         }
-        r = api_client.put(f'/api/board/{board.id}/column/{column.id}/',
-                           data=data)
+        r = api_client.put(
+            f'/api/board/{board.id}/column/{column.id}/'
+            f'ticket/{ticket.id}/comment/{ticket_comment.id}/',
+            data=data)
         assert r.status_code == status_code
         if status_code == 200:
-            column_name = r.json()['name']
-            assert column_name != column.name
+            ticket_message = r.json()['message']
+            assert ticket_message != ticket_comment.message
 
     @pytest.mark.django_db(transaction=True)
     def test_delete(
@@ -148,8 +168,15 @@ class TestColumnPermissionsApi(object):
                                   contributors=create_contribs,
                                   preference=board_preference)
         column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
+        ticket_comment = self.create_ticket_comment(
+            ticket.id,
+            owner_id=create_contribs[0].id)
         api_client.credentials(**auth_header)
-        r = api_client.delete(f'/api/board/{board.id}/column/{column.id}/')
+        r = api_client.delete(
+            f'/api/board/{board.id}/column/{column.id}/'
+            f'ticket/{ticket.id}/comment/{ticket_comment.id}/'
+        )
         assert r.status_code == status_code
         if status_code == 200:
             board_name = r.json()['name']
@@ -169,11 +196,17 @@ class TestColumnPermissionsApi(object):
         board = self.create_board(owner=create_pm,
                                   contributors=create_contribs,
                                   preference=board_preference)
+        column = self.create_column(board_id=board.id)
+        ticket = self.create_ticket(column_id=column.id)
         data = {
-            'name': 'new column'
+            'message': 'new descript',
         }
         api_client.credentials(**auth_header)
-        r = api_client.post(f'/api/board/{board.id}/column/', data=data)
+        r = api_client.post(
+            f'/api/board/{board.id}/column/{column.id}/'
+            f'ticket/{ticket.id}/comment/',
+            data=data
+        )
         assert r.status_code == status_code
 
     def create_board(
@@ -197,3 +230,18 @@ class TestColumnPermissionsApi(object):
         column = Column(name='Test column', board_id=board_id)
         column.save()
         return column
+
+    def create_ticket(self, column_id):
+        ticket = Ticket(column_id=column_id,
+                        name='Test column',
+                        description='Test description',
+                        )
+        ticket.save()
+        return ticket
+
+    def create_ticket_comment(self, ticket_id, owner_id):
+        ticket_comment = TicketComment(ticket_id=ticket_id,
+                                       message='Test message',
+                                       owner_id=owner_id)
+        ticket_comment.save()
+        return ticket_comment

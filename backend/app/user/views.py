@@ -17,6 +17,11 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return []
+        return super().get_permissions()
+
 
 class DecoratedTokenObtainPairView(TokenObtainPairView):
     @swagger_auto_schema(

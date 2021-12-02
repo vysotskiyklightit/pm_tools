@@ -7,6 +7,7 @@ exclude =
     venv/*,
     **/core
     **/settings
+    **/tests
 ignore =
     H306,  # Imports not in alphabetical order
     D101,  # Missing docstring in public class
