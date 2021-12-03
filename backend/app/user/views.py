@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, response, status, views, viewsets
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 from user.serializers import (TokenObtainPairResponseSerializer,
@@ -21,6 +21,19 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.request.method == 'POST':
             return []
         return super().get_permissions()
+
+
+class UserMe(views.APIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(self._get_user(),
+                                    context={'request': request})
+        return response.Response(serializer.data, status=200)
+
+    def _get_user(self):
+        return User.objects.get(id=self.request.user.id)
 
 
 class DecoratedTokenObtainPairView(TokenObtainPairView):

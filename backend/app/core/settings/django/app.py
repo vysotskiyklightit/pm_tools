@@ -25,6 +25,8 @@ SECRET_KEY = '&fg6h!)&x3$6yd(ltaf#bt4r6w8kogjnq#&=7#+90d=o%*pc4'
 DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 # Application definition
 
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

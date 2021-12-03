@@ -10,7 +10,7 @@ services:
       - ./backend/static/:/app/static/
       - ./backend/media/:/app/media/
     environment:
-      - DEBUG=False
+      - DEBUG=True
       - LOG_LEVEL=info
       - DOMAIN=${DOMAIN-localhost}
     restart: on-failure
