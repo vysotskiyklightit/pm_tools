@@ -5,6 +5,8 @@ import { selectIsLoggedIn } from './state/auth/authSelectors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Authorization from './components/wrappers/Authorization'
 import Layout from "./components/layouts/layout";
+import BoardsCards from "./components/Home/BoardsCards";
+import BoardDetail from "./components/Board/boardDetail";
 
 const PrivateRoute: React.FC<any> = ({ children, ...rest }) => {
   const isLoggedIn = useSelector(selectIsLoggedIn);
@@ -19,17 +21,25 @@ const PrivateRoute: React.FC<any> = ({ children, ...rest }) => {
 const App = () => {
   return (
     <BrowserRouter>
-        <CssBaseline>
+        <CssBaseline />
       <Authorization>
       <Switch>
         <PrivateRoute exact path="/">
             <Layout>
-          <div>Home</div>
+          <BoardsCards />
             </Layout>
         </PrivateRoute>
+          <PrivateRoute
+              exact
+              path="/board/:id"
+              render={({ match: { params } }: any) => (
+                <Layout>
+                  <BoardDetail boardId={params.id} />
+                </Layout>
+              )}
+            />
       </Switch>
       </Authorization>
-            </CssBaseline>
     </BrowserRouter>
   );
 }

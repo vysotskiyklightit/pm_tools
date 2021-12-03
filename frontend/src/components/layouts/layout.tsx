@@ -6,7 +6,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import NavBar from './NavBar';
 
-const drawerWidth = 240;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,8 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       }),
     },
     appBarShift: {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: drawerWidth,
+      width: `100%`,
       transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
@@ -32,26 +30,10 @@ const useStyles = makeStyles((theme: Theme) =>
     menuButton: {
       marginLeft: theme.spacing(1),
     },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.secondary.main,
-      width: drawerWidth,
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      height: theme.spacing(6),
-      justifyContent: 'flex-end',
-    },
+
     content: {
       '& .fas, & .far': {
-        marginRight: theme.spacing(1),
+        marginRight: theme.spacing(50),
       },
       backgroundColor: theme.palette.background.default,
       flexGrow: 1,
@@ -60,11 +42,8 @@ const useStyles = makeStyles((theme: Theme) =>
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      marginLeft: -drawerWidth,
     },
-    drawerContainer: {
-      overflow: 'auto',
-    },
+
     contentShift: {
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,

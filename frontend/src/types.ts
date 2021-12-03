@@ -1,3 +1,4 @@
+import BoardColumns from "./components/Board/boardColumns";
 
 export type LoginFormData = {
   username: string;
@@ -9,7 +10,7 @@ export type LoginError = {
 };
 
 export type RefreshToken = {
-  refresh: string;
+  refresh: string | null;
 };
 
 export type TokenResponse = {
@@ -28,4 +29,38 @@ export type UserState = {
   username: string;
   email: string;
   groups: string[];
+};
+
+export type BoardList = {
+  data: Board[];
+};
+
+export type Board = {
+  id: number;
+  name: string;
+  preference: string;
+  owner: number;
+  contributors: number[];
+};
+
+export type BoardsState = {
+  isFetching: boolean;
+  data: Board[];
+};
+
+export type ColumnsState = {
+  isFetching: boolean;
+  data: BoardColumn[];
+};
+
+export type BoardColumnsResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: BoardColumn[];
+};
+
+export type BoardColumn = {
+  id: number;
+  name: string;
 };

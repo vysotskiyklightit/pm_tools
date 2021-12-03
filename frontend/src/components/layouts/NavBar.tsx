@@ -61,8 +61,7 @@ const NavBar: React.FC = () => {
           className={clsx(classes.logoutButton, classes.hoverableButton)}
         >
           <i className="far fa-user" />
-          {/* eslint-disable-next-line */}
-          Admin |<i>&nbsp;Logout</i>
+          <i>Logout</i>
         </Button>
       </div>
     </Toolbar>

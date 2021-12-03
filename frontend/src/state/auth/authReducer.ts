@@ -72,7 +72,7 @@ export const autologin = createAsyncThunk<UserState, string>(
 );
 
 export const logout = createAsyncThunk('logout', async () => {
-  delete api.defaults.headers.common.Authorization;
+  api.defaults.headers.common.Authorization = 'null';
 
   localStorage.removeItem('access');
   localStorage.removeItem('refresh');
