@@ -1,28 +1,6 @@
-from abc import ABC, abstractmethod
 from typing import List, Type
 
 from rest_framework.permissions import BasePermission
-
-
-class IService(ABC):
-
-    @abstractmethod
-    def execute(self):
-        pass
-
-
-class IPresenter(ABC):
-
-    @abstractmethod
-    def present(self):
-        pass
-
-
-class IPreprocessors(ABC):
-
-    @abstractmethod
-    def process(self):
-        pass
 
 
 def method_permission(permissions: List[Type[BasePermission]]):
