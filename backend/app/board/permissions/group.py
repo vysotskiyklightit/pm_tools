@@ -1,4 +1,4 @@
-from board.config.common import SystemUsers
+from common.constants import SystemUsers
 from django.contrib.auth.models import Group, User
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 

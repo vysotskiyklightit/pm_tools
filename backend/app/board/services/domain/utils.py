@@ -1,7 +1,7 @@
 from typing import Iterable, List
 
-from board.config.utils import IService
 from board.services.infrastructure.dao.column import ColumnEntity, column_dao
+from common.interfaces import IService
 
 
 class ColumnDefaultEntities(IService):

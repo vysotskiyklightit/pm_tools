@@ -1,6 +1,6 @@
 from typing import Type, TypeVar, Union
 
-from board.config.utils import IPresenter
+from common.interfaces import IPresenter
 from django.db.models import Model, QuerySet
 from rest_framework import status
 from rest_framework.response import Response

@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import include, path, re_path
@@ -21,7 +20,6 @@ from django.views.generic.base import RedirectView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from user.views import DecoratedTokenObtainPairView, DecoratedTokenRefreshView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,12 +33,6 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
-url_installed_apps = [
-    path('api/token/', DecoratedTokenObtainPairView.as_view(),
-         name='token_obtain_pair'),
-    path('api/token/refresh/', DecoratedTokenRefreshView.as_view(),
-         name='token_refresh'),
-]
 
 urlpatterns_DOC = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
@@ -63,6 +55,7 @@ defaults = [
 api = [
     path('api/', include('user.config.urls')),
     path('api/', include('board.config.urls')),
+    path('api/', include('user_auth.urls')),
 ]
 
-urlpatterns = url_installed_apps + urlpatterns_DOC + defaults + api
+urlpatterns = urlpatterns_DOC + defaults + api

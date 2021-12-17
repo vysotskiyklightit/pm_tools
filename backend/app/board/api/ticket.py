@@ -1,5 +1,3 @@
-from board.api.bases import PathDependsRelationBoardAPIView
-from board.config.utils import method_permission
 from board.models import Ticket, TicketComment
 from board.permissions import IsContributorOrOwnerBoardFromPath
 from board.serializers.ticket import (TicketCommentCreateSerialize,
@@ -9,6 +7,8 @@ from board.serializers.ticket import (TicketCommentCreateSerialize,
                                       TicketListSerialize,
                                       TicketRetrieveSerialize,
                                       TicketUpdateSerialize)
+from common.bases import PathDependsRelationBoardAPIView
+from common.utils import method_permission
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin, RetrieveModelMixin,

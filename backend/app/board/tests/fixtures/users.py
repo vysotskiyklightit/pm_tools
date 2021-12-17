@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from board.config.common import SystemUsers
+from common.constants import SystemUsers
 from django.contrib.auth.models import Group, User
 
 PASSWORD = 'strong-test-pass'

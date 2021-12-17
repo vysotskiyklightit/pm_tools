@@ -1,6 +1,6 @@
 from typing import Type, TypeVar
 
-from board.config.utils import IPreprocessors
+from common.interfaces import IPreprocessors
 from rest_framework.request import Request
 from rest_framework.serializers import BaseSerializer
 

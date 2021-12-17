@@ -1,8 +1,7 @@
-from typing import List
 
-from board.filters.path import PathParamsFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.request import Request
+
+from .utils.filters import PathParamsFilter
 
 
 class PathDependsRelationBaseAPIView(GenericAPIView):

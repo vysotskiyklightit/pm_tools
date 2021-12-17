@@ -1,6 +1,6 @@
-from board.config.common import BoardPreference
-from board.config.utils import IService
 from board.services.infrastructure.dao.board import board_dao
+from common.constants import BoardPreference
+from common.interfaces import IService
 from django.contrib.auth.models import User
 from django.db.models import Q, QuerySet
 

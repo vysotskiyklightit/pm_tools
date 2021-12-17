@@ -1,7 +1,7 @@
 import pytest
-from board.config.common import BoardPreference
 from board.models import Board, Column
 from board.tests.api_tests import scenarios
+from common.constants import BoardPreference
 from django.contrib.auth.models import User
 
 list_owner_public = {

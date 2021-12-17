@@ -1,4 +1,4 @@
-from board.config.common import BoardPreference
+from common.constants import BoardPreference
 
 list_owner_public = {
     'username': 'test_user',

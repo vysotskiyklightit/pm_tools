@@ -1,14 +1,14 @@
-from board.config.common import BoardPreference
+from common.constants import BoardPreference
 from django.db import models
 
 
 class Board(models.Model):
     owner = models.ForeignKey(
-        'auth.User',
+        'user_auth.User',
         on_delete=models.CASCADE
     )
     contributors = models.ManyToManyField(
-        'auth.User',
+        'user_auth.User',
         related_name='contributors'
     )
     name = models.CharField(max_length=120)
@@ -32,7 +32,7 @@ class Ticket(models.Model):
     )
     name = models.CharField(max_length=120)
     executor = models.ForeignKey(
-        'auth.User',
+        'user_auth.User',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -47,7 +47,7 @@ class TicketComment(models.Model):
         related_name='comments'
     )
     owner = models.ForeignKey(
-        'auth.User',
+        'user_auth.User',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

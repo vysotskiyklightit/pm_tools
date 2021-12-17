@@ -1,5 +1,3 @@
-from board.api.bases import PathDependsRelationBoardAPIView
-from board.config.utils import method_permission
 from board.models import Board, Column
 from board.permissions import (IsContributorOrOwnerBoardFromPath,
                                IsOwnerBoardFromPath, IsPM)
@@ -16,6 +14,8 @@ from board.services.application.usecases.board import (BoardCreateCase,
                                                        BoardListCase)
 from board.services.infrastructure.presenters.board import (BoardListPresenter,
                                                             BoardPresenter)
+from common.bases import PathDependsRelationBoardAPIView
+from common.utils import method_permission
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
